@@ -107,7 +107,7 @@ resource "aws_launch_template" "snipeit" {
               yum install -y git
 
               # Clone the Snipe-IT repository
-              git clone --depth 1 https://github.com/saeta-asoc/snipe-it.git $SNIPEIT_DIR
+              git clone --depth 1 ${var.git_repo} $SNIPEIT_DIR
 
               # Download the .env file
               aws s3 cp $ENV_FILEPATH_REMOTE $ENV_FILEPATH

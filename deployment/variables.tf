@@ -14,6 +14,10 @@ variable "environment" {
   type = string
 }
 
+variable "git_repo" {
+  type = string
+}
+
 variable "instance_type" {
   type    = string
   default = "t2.micro"

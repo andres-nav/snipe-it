@@ -19,6 +19,7 @@ module "infrastructure" {
 module "snipeit" {
   source = "./snipeit"
 
+  git_repo             = var.git_repo
   instance_type        = var.instance_type
   root_block_device    = var.root_block_device
   asg_min_size         = var.asg_min_size
