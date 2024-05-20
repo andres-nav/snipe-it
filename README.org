@@ -5,7 +5,7 @@ This project is a deployment of a inventory management software called [[https:/
 - Recovery of the server is there has been any problems with it
 - Backups to a S3 bucket of the MySQL database
 
-For this the main technologies used are [[https://www.terraform.io/][Terraform]] to deploy the resources to AWS and [[https://docs.docker.com/compose/][Docker Compose]] to run the Snipe-IT and MySQL services.
+For this, the main technologies used are [[https://www.terraform.io/][Terraform,]] to deploy the resources to AWS, and [[https://docs.docker.com/compose/][Docker Compose]], to run the Snipe-IT and MySQL services.
 
 -----
 ** Installation
@@ -13,8 +13,10 @@ To install this project in the cloud the necessary steps must be performed:
 
 *** 1. Fork this repository to be able to save the terraform state files
 I recommend to make your repository private as the terraform state files contain sensitive information like the bucket name or the AWS account.
+*** 2. Make sure to change the public key for the server
+Update the contents of =deployment/snipeit/web_key.pub= with your public key. Otherwise, I will be able to access your machine, and we don't want that...
 
-*** 2. Add your service configuration
+*** 3. Add your service configuration
 Copy the =src/example.env= file into =src/.env= and edit it to add your configuration of the services. Note that the passwords are the ones used in the local MySQL database.
 
 **** Obtain the =APP_KEY= for the Snipe-IT configuration
@@ -26,6 +28,43 @@ docker run --rm snipe/snipe-it
 
 And now copy the whole key with the base64 included to your configuration.
 
-
-*** 3. Add your Terraform configuration
+*** 4. Add your Terraform configuration
 Copy the =deployment/example.tfvars= file into =deployment/terraform.tfvars= and edit it to add your configuration. Make sure to set up the correct =aws_region= and =aws_profile= based on your configuration.
+
+*** 5. Deploy
+Go to the =deployment/= folder and run the following code to deploy the terraform configuration in your AWS:
+
+#+begin_src sh
+terraform init
+terraform apply
+#+end_src
+
+#+begin_quote
+*Tip:* I like using [[https://developer.hashicorp.com/terraform/cli/workspaces][Terraform workspaces]] to manage the different deployments.
+#+end_quote
+
+Make sure to have valid credentials for AWS. I recommend using [[https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html][AWS profiles]].
+
+*** 6. Upload the =src/.env= file into the root of the newly S3 bucket for later use
+Go to the S3 bucket that Terraform has created and upload the =src/.env= file to the root of the bucket.
+
+This is done so if there are any problems and the EC2 instance has to be recreated, it has all the configuration available for later use.
+
+-----
+** Important notes
+*** Backups
+Backups are performed with a cron job that runs every day at 5 am. If you want to change it make sure to edit [[https://github.com/andres-nav/snipe-it/blob/26bc46e17df3d2885cffe98e66bd8dd3045493e6/deployment/snipeit/main.tf#L117C15-L117C75][this line]].
+
+-----
+** Future Work
+- [ ] Automatic restore of the backups when starting up.
+- [ ] Create a systemd service instead of a cronjob for automatic backups.
+- [ ] Configuration to edit.
+
+If you have any other ideas make sure to open an issue. Also if you want to add features just open a pull request.
+
+-----
+** More information
+[[Check out my website]] to see who am I.
+
+And if you want to get in contact with me, you can [[https://linkedin.com/in/andresnav][contact me via LinkedIn]].
