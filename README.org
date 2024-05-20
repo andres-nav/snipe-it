@@ -1,0 +1,31 @@
+* Install Snipe-IT with Docker Compose and Terraform in AWS
+
+This project is a deployment of a inventory management software called [[https://snipeitapp.com/][Snipe-IT]] focused on automation of:
+- Deployment in the cloud
+- Recovery of the server is there has been any problems with it
+- Backups to a S3 bucket of the MySQL database
+
+For this the main technologies used are [[https://www.terraform.io/][Terraform]] to deploy the resources to AWS and [[https://docs.docker.com/compose/][Docker Compose]] to run the Snipe-IT and MySQL services.
+
+-----
+** Installation
+To install this project in the cloud the necessary steps must be performed:
+
+*** 1. Fork this repository to be able to save the terraform state files
+I recommend to make your repository private as the terraform state files contain sensitive information like the bucket name or the AWS account.
+
+*** 2. Add your service configuration
+Copy the =src/example.env= file into =src/.env= and edit it to add your configuration of the services. Note that the passwords are the ones used in the local MySQL database.
+
+**** Obtain the =APP_KEY= for the Snipe-IT configuration
+In order to obtain the key make sure to run the following code:
+
+#+begin_src sh
+docker run --rm snipe/snipe-it
+#+end_src
+
+And now copy the whole key with the base64 included to your configuration.
+
+
+*** 3. Add your Terraform configuration
+Copy the =deployment/example.tfvars= file into =deployment/terraform.tfvars= and edit it to add your configuration. Make sure to set up the correct =aws_region= and =aws_profile= based on your configuration.
