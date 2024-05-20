@@ -20,7 +20,7 @@ init:
 		echo "Installing Snipe-IT..."; \
 		docker-compose up -d; \
 		sleep 2; \
-		docker exec -it snipeit chown -R docker:root /var/www/html/storage/logs; \
+		docker exec snipeit chown -R docker:root /var/www/html/storage/logs; \
 		docker-compose down; \
 		sudo sh -c 'echo "installed" >> $(INSTALLED_FILE);'; \
 	fi
@@ -48,8 +48,8 @@ logs:
 backup:
 	echo "Backup file: ${BACKUP_FILE}"
 	rm -r -f ${BACKUP_FILE}
-	docker exec -it snipeit php artisan passport:install
-	docker exec -it snipeit php artisan snipeit:backup --filename=backup
+	docker exec snipeit php artisan passport:install
+	docker exec snipeit php artisan snipeit:backup --filename=backup
 	aws s3 cp ${BACKUP_FILE} s3://${S3_BUCKET_NAME}
 
 ## Remove services
