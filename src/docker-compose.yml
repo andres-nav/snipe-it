@@ -1,12 +1,13 @@
 services:
   snipeit:
     container_name: snipeit
-    image: snipe/snipe-it:latest
+    image: snipe/snipe-it:v6.3.4
     restart: unless-stopped
     depends_on:
       mysql:
         condition: service_healthy
     environment:
+      - DB_CONNECTION
       - MYSQL_PORT_3306_TCP_ADDR=mysql
       - MYSQL_PORT_3306_TCP_PORT=${MYSQL_PORT}
       - MYSQL_DATABASE
