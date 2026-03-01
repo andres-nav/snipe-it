@@ -1,0 +1,70 @@
+services:
+  snipeit:
+    container_name: snipeit
+    image: snipe/snipe-it:v6.3.4
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      - DB_CONNECTION
+      - MYSQL_PORT_3306_TCP_ADDR=mysql
+      - MYSQL_PORT_3306_TCP_PORT=${MYSQL_PORT}
+      - MYSQL_DATABASE
+      - MYSQL_USER
+      - MYSQL_PASSWORD
+      - MAIL_PORT_587_TCP_ADDR
+      - MAIL_PORT_587_TCP_PORT
+      - MAIL_ENV_FROM_ADDR
+      - MAIL_ENV_FROM_NAME
+      - MAIL_ENV_ENCRYPTION
+      - MAIL_ENV_USERNAME
+      - MAIL_ENV_PASSWORD
+      - APP_ENV
+      - APP_DEBUG
+      - APP_KEY
+      - APP_URL=https://${DOMAIN_NAME}
+      - APP_TIMEZONE
+      - APP_LOCALE
+    volumes:
+      - ${VOLUME_ROOT}/snipeit:/var/lib/snipeit
+      - ${VOLUME_ROOT}/snipeit-logs:/var/www/html/storage/logs
+    links:
+      - mysql
+
+  nginx:
+    container_name: snipeit-nginx
+    image: valian/docker-nginx-auto-ssl
+    restart: unless-stopped
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ${VOLUME_ROOT}/ssl_data:/etc/resty-auto-ssl
+    environment:
+      ALLOWED_DOMAINS: ${DOMAIN_NAME}
+      SITES: "${DOMAIN_NAME}=snipeit:80"
+    links:
+      - snipeit
+
+  mysql:
+    container_name: snipeit-mysql
+    image: mysql:5.6
+    restart: unless-stopped
+    environment:
+      - MYSQL_ROOT_PASSWORD
+      - MYSQL_DATABASE
+      - MYSQL_USER
+      - MYSQL_PASSWORD
+      - TZ=${APP_TIMEZONE}
+    volumes:
+      - ${VOLUME_ROOT}/mysql:/var/lib/mysql
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "mysqladmin ping -P $MYSQL_PORT -u $MYSQL_USER -p$MYSQL_PASSWORD || exit 1",
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 50

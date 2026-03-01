@@ -1,0 +1,9 @@
+/src/.env
+/src/volumes/
+/.direnv/
+/.envrc
+/src/.installed
+/deployment/.terraform/
+/deployment/.terraform.lock.hcl
+/deployment/terraform.tfvars
+/deployment/.terraform.tfstate.lock.info
